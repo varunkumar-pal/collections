@@ -1,0 +1,40 @@
+# use Node base image
+FROM node:latest AS appstore
+# change to working directory
+WORKDIR /usr/src/myapp/app/react-app
+# copy package.json along with ReactJs source to the working directory
+COPY react-app .
+# run npm to install all necessary react-app node dependencies
+RUN npm install
+#npm build to bundle react-app using node dependencies and reactJs into build dir
+RUN npm run build
+# above steps will build an image called appstore though wont be visible by docker image ls
+
+#compile REST App using maven base image
+FROM maven:latest AS AppServer
+# declare the working directory
+WORKDIR /usr/src/myapp
+# copy the pom.xml which maven uses to install the dependencies
+COPY pom.xml .
+RUN mvn -B -f pom.xml -s /usr/share/maven/ref/settings-docker.xml dependency:resolve
+#copy all source files
+COPY . .
+# run maven to build MyApp.jar fiel
+RUN mvn -B -s /usr/share/maven/ref/settings-docker.xml package -DskipTests
+# above steps create image called AppServer
+
+# use JAVA base image to create the final image
+FROM java:latest
+# use static as the working dir
+WORKDIR /static
+# copy all the contents from the build directory of appstore here
+COPY --from=appstore /usr/src/myapp/app/react-app/build/ .
+# can use offsets like COPY --from=0 /usr/src/myapp/app/react-app/build/ .
+WORKDIR /app
+# copy the jar from second module to app dir
+COPY --from=appserver /usr/src/atsea/target/myapp.jar .
+# seeting entrypoint to start the app
+ENTRYPOINT ["java", "-jar", "/app/myapp.jar"]
+# set profile to use PostgreSQL
+CMD ["--spring.profiles.active=postgres"]
+# final image is compact as it contains only compiled app in java image
