@@ -1,0 +1,83 @@
+# This compose file creates a simplified development environment consisting of only the application server and the database
+# docker-compose --file docker-compose-dev.yml up --build
+
+
+version: "1.0"
+
+
+
+services:
+
+  database:
+
+    build: 
+
+       context: ./database
+
+    image: myapp_db
+
+    environment:
+
+      POSTGRES_USER: scott
+
+      POSTGRES_DB: myapp
+
+    ports:
+
+      - "4321:4321" 
+
+    networks:
+
+      - back-tier
+
+    secrets:
+
+      - postgres_password
+
+
+
+  appserver:
+
+    build:
+
+       context: app
+
+       dockerfile: Dockerfile-dev
+
+    image: myapp
+
+    ports:
+
+      - "8080:8080"
+
+      - "5000:5000"
+
+    networks:
+
+      - front-tier
+
+      - back-tier
+
+    secrets:
+
+      - postgres_password
+
+
+
+secrets:
+
+  postgres_password:
+
+    file: ./devsecrets/postgres_password
+
+    
+
+networks:
+
+  front-tier:
+
+  back-tier:
+
+  payment:
+
+    driver: overlay
