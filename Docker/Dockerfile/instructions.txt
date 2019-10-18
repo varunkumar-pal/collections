@@ -1,3 +1,11 @@
 you create the Dockerfile and define the steps that build up your images
 you issue the docker build command which will build a Docker image from your Dockerfile
 now you can use this image to start containers with the docker run command
+
+# Create and deploy to swarm
+docker swarm init
+docker stack deploy -c docker-stack.yml myapp
+
+# to run myapp as an application
+docker-compose up --build
+
