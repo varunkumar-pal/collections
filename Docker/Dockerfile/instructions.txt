@@ -1,0 +1,3 @@
+you create the Dockerfile and define the steps that build up your images
+you issue the docker build command which will build a Docker image from your Dockerfile
+now you can use this image to start containers with the docker run command
