@@ -1,0 +1,89 @@
+# must be the first non-comment instruction.
+# if tag is ommitted builder assumes latest by default
+# an error is returned if it cannot match the tag values
+FROM openjdk:8u212-jre-alpine
+
+# adds trigger instruction to be executed at a later time, when the image is used as the base for another build. 
+# executed immediately after the FROM of the child
+ONBUILD
+
+
+# allows you to set the Author field of the generated images
+MAINTAINER
+
+# sets the username when running the image and for any instructions that follow
+USER root
+
+
+# variable that users can pass at build-time with docker build using the --build-arg flag
+# visible to any users of the image with docker history command
+# ENV overrides ARG
+ARG kafka_version=2.3.0
+ARG scala_version=2.12
+
+# set working dir for RUN CMD ENTRYPOINT COPY ADD
+WORKDIR
+
+# adds metadata to the images
+# use quotes to include spaces
+# new value overrides previous labels
+# to view image's label, use the docker inspect command
+LABEL org.label-schema.name="kafka" \
+
+      org.label-schema.description="Apache Kafka" \
+
+      org.label-schema.build-date="${build_date}" \
+
+# command is run in a shell
+RUN apk add --no-cache bash curl jq docker \
+
+ && chmod a+x /tmp/*.sh \
+
+ && mv /tmp/start-kafka.sh /tmp/broker-list.sh /tmp/create-topics.sh /tmp/versions.sh /usr/bin \
+
+ && sync && /tmp/download-kafka.sh \
+ 
+
+# informs Docker that the container listens on the specified port at runtime
+# doesnt make ports accessible to host
+EXPOSE [8080] 
+
+
+# set the env variables
+# var persists when a container is run from resulting image
+ENV KAFKA_VERSION=$kafka_version \
+
+    SCALA_VERSION=$scala_version \
+
+    KAFKA_HOME=/opt/kafka \
+
+    GLIBC_VERSION=$glibc_version
+ 
+# copies files, dir or remote file urls
+# <src> is relative to the source dir
+# <dest> is an absolute path or relative to WORKDIR
+# if <dest> doesnt exist, it is created 
+ADD
+
+COPY
+
+
+ 
+# provide defaults for an executing container
+# if executable isnt provided then ENTRYPOINT instruction should be specified
+# if more than one then the last one will be taken into affect
+# can be used to provide default arguments for ENTRYPOINT
+# can be over ridden by specifying arguments in docker run
+CMD ["start-kafka.sh"]
+
+
+# only the last will take an effect
+ENTRYPOINT
+ 
+# creates a mount volume with the name specified and marks it as holding externally mounted volumes from native host or other containers
+VOLUME ["/kafka"]
+
+# tell docker how to test a container to check that it is still working
+# pass = healthy = 0,failure = unhealthy = 1
+# only last one takes effect
+HEALTHCHECK
