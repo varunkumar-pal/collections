@@ -1,0 +1,10 @@
+# basic file to download nginx and redis image
+
+version '3'
+
+services:
+    web:
+      image: nginx
+    
+    database:
+      image: redis
