@@ -1,3 +1,23 @@
+# check docker-compose version
 docker-compose -v
 docker-compose --version
 docker-compose version
+
+# to install docker-compose
+pip install -U docker-compose
+
+# to check whether the file is valid
+docker-compose config
+
+# to start docker compose in a detached mode so that the terminal is available
+docker-compose up -d
+
+# to check whether the containers are downloaded
+docker-compose ps
+
+# to stop all the mentioned containers
+docker-compose down
+
+# to scale
+# to install 4 instances of database container
+docker-compose up -d --scale database=4
