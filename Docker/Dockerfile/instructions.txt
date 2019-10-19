@@ -9,3 +9,5 @@ docker stack deploy -c docker-stack.yml myapp
 # to run myapp as an application
 docker-compose up --build
 
+# To view an image’s labels(declared via LABEL), use the docker inspect command
+# If the user specifies arguments to docker run then they will override the default specified in CMD.
