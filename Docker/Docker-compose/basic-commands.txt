@@ -21,3 +21,7 @@ docker-compose down
 # to scale
 # to install 4 instances of database container
 docker-compose up -d --scale database=4
+
+# once it is up, to check the logs
+docker-compose logs
+
