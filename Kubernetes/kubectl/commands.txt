@@ -1,0 +1,70 @@
+kubectl [command] [TYPE] [NAME] [flags]
+
+kubectl get pod nginx-pod -w
+
+TYPE - case insensitive
+
+pod(s) - po
+deployments(s) - deploy
+replicateset(s) - rs
+replicationcontroller(s) - rc
+service(s) - svc
+daemonset(s) - ds
+namespace(s)  - ns
+persistentvolume(s) - pv
+persistentvolumsclaim(s) - pvc
+job(s)
+cronjobs(s)
+
+## create a resource from a file
+
+kubectl create -f pod-example.yaml/js (manifest file)
+
+# create objects from multiple files
+
+kubectl create -f <dir>
+
+## to display high-level details of resources
+# to display all pods within a cluster
+kubectl get pods
+# to display resources within a specific pod
+kubectl get pods <pod-name>
+# to know pod is running on which node
+kubectl get pods -o wide
+# to display multiple resources within the same cmd
+kubectl get pods,deploy
+
+## display detailed state of one or more resources including events triggered by a resource
+
+# details about a node
+kubectl describe nodes <node-name>
+# details about a pod
+kubectl describe pods <pod-name>
+# details about all pods in a node
+kubectl describe pods
+
+## delete resources
+#delete resources described in a manifest file
+kubectl delete -f pod.yaml
+#delete resources described by a label
+kubectl delete pods,services -l name=<label-name>
+#delete all pods resources
+kubectl delete pods --all
+
+## execute a cmd against a container in a pod
+#execute date in a pod with single container
+kubectl exec <pod-name> date
+#execute date in a specific container of a pod from master
+kubectl exec <pod-name> -c <container-name> date
+#execute cmd from within pod
+kubectl exec -it <pod-name> /bin/bash
+
+## print logs for a container in a pod
+#print logs of a pod
+kubectl logs <pod-name>
+# to tail logs
+kubectl logs -f <pod-name>
+
+
+
+
