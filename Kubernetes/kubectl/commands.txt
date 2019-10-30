@@ -16,23 +16,50 @@ persistentvolumsclaim(s) - pvc
 job(s)
 cronjobs(s)
 
-## create a resource from a file
-
+## create a resource/service from a file
 kubectl create -f pod-example.yaml/js (manifest file)
-
 # create objects from multiple files
-
 kubectl create -f <dir>
+# start a single instance of nginx
+kubectl create deployment nginx --image=nginx
+
+
+## apply manages applications through files defining kubernetes resources. It creates ad updates resources in a cluster\.
+#create resource
+kubectl apply -f ./my-manifest.yaml
+# create from multiple files
+kubectl apply -f ./my1.yaml -f ./my2.yaml
+# create resources from all manifests in a dir
+kubectl apply -f ./dir
+# create resource from url
+
+
 
 ## to display high-level details of resources
 # to display all pods within a cluster
 kubectl get pods
 # to display resources within a specific pod
 kubectl get pods <pod-name>
-# to know pod is running on which node
+# to know pod is running on which node and ip address
 kubectl get pods -o wide
 # to display multiple resources within the same cmd
 kubectl get pods,deploy
+# to display all pods including custom
+kubectl get pods --all-namespaces
+# to display pod details in yaml
+kubectl get pod <name-of-the-pod> -o yaml
+# to display pods that are tagged with a particular label
+kubectl get po -l app=nginx-app
+# to display the count of nodes in rc
+kubectl get rc nginx-rc
+kubectl get rs nginx-rc -o wide
+# to display all services inside a cluster
+kubectl get service -l app=nginx-app
+# get all running pods in the namespace
+kubectl get pods --field-selector=status.phase=Running
+# show labels for all pods
+kubectl get pods --show-labels
+
 
 ## display detailed state of one or more resources including events triggered by a resource
 
@@ -42,6 +69,12 @@ kubectl describe nodes <node-name>
 kubectl describe pods <pod-name>
 # details about all pods in a node
 kubectl describe pods
+# details regarding replication controller
+kubectl describe rc nginx-rc
+kubectl describe rs nginx-rc
+kubectl describe deploy nginx-deployment
+kubectl describe svc nginx-deployment
+
 
 ## delete resources
 #delete resources described in a manifest file
@@ -56,8 +89,12 @@ kubectl delete pods --all
 kubectl exec <pod-name> date
 #execute date in a specific container of a pod from master
 kubectl exec <pod-name> -c <container-name> date
-#execute cmd from within pod
-kubectl exec -it <pod-name> /bin/bash
+#execute cmd from master into pod
+kubectl exec -it <pod-name> -- /bin/bash
+# to check if cache is mounted in the pod
+kubectl exec test-emptydir df /cache
+
+
 
 ## print logs for a container in a pod
 #print logs of a pod
@@ -66,5 +103,47 @@ kubectl logs <pod-name>
 kubectl logs -f <pod-name>
 
 
+## to scale up the app instances
+kubectl scale rc nginx-rc --replicas=5
+kubectl scale rs nginx-rs --replicas=5
+kubectl scale deployment nginx-deployment --replicas=5
 
 
+#steps for update deployment, record flag remembers the cmd
+kubectl set image deploy nginx-deployment nginx-container=nginx:1.9.1 --record
+# other way to set the parameters for rollout
+kubectl edit deploy nginx-deployment
+#display the status of the rollout
+kubectl rollout status deployment/nginx-deployment
+#cmds executed as part of the upgrade
+kubectl rollout history deployment/nginx-deployment
+# to rollback the deployment
+kubectl rollout undo deployment/nginx-deployment
+kubectl get deploy
+# get the documentation for pod and svc
+kubectl explain pods, svc
+# check history of deployment
+kubectl rollout history deployment/frontend
+# rollback to a previous version
+kubectl rollout undo deployment/frontend
+
+
+## interacting with running pods
+# dump pod logs
+kubectl logs my-pod
+# dump pod logs with label myLabel
+kubectl logs -l name=myLabel
+# dump pod container logs
+kubectl logs my-pod -c my-container
+# stream pod logs
+kubectl logs -f my-pod
+# stream pod container logs
+kubectl logs -f my-pod -c my-container
+# show metrics for a given node
+kubectl top node my-node
+#display address of master and services
+kubectl cluster-info
+# dump current cluster state
+kubectl cluster-info dump
+# dump current cluster state to a path
+kubectl cluster-info dump --output-directory=/path

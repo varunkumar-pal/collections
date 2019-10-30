@@ -1,0 +1,45 @@
+##creating dynamic persistent storage is a 3 step proces
+# first is to create the storage class
+#storage-class.yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+ name: fast
+provisioner: kubernetes.io/gce.pd
+parameters:
+ type: pd-ssd
+ 
+#create the persistent volume claim
+# pvc-dv1.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+ name: my-disk-claim-1 
+spec:
+ resources:
+  requests:
+   storage: 30Gi
+ accessModes:
+  - ReadWriteOnce
+ storageClassName: fast
+ # this is the name of the storage class defined in the first section
+ 
+# referncing claim in pod
+# nginx-pv.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+ name: pv-pod
+spec:
+ containers:
+ - name: test-container
+   image: nginx 
+   volumeMounts:
+   - mountPath: /test-pd
+     name: test-volume
+ volumes:
+ - name: test-volume
+ persistentVolumeClaim:
+   claimName: my-disk-claim-1
+# name for pvc file   
+ 

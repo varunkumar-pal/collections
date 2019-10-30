@@ -1,0 +1,25 @@
+# manifest file for replicaset
+#nginx-rs.yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+ name: nginx-rs
+ label: latest
+spec:
+ replicas: 3
+ selector:
+   matchLabels:
+     app: nginx-app
+   matchExpressions:
+     - {key: tier, operator: In, values: [frontend]}
+ template:
+   metadata:
+     name: nginx-pod
+	 labels:
+	   app: nginx-app
+   spec:
+     containers:
+	 - name: nginx-containers
+	   image: nginx
+	   ports:
+	   - containerPort: 80
